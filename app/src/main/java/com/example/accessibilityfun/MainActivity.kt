@@ -3,6 +3,10 @@ package com.example.accessibilityfun
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.BulletSpan
+import com.google.accompanist.web.LoadingState
+import com.google.accompanist.web.WebContent
+import com.google.accompanist.web.WebView
+import com.google.accompanist.web.rememberWebViewState
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -163,6 +167,16 @@ fun TestTextList() {
     )
 }
 
+
+@Composable
+fun TestWebView() {
+    val state = rememberWebViewState("https://example.com")
+
+    WebView(
+        state
+    )
+
+}
 
 @Preview(showBackground = true)
 @Composable
