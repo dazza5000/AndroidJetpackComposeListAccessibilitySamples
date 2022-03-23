@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">AccessibilityFun</string>
+    <string name="list_string">
+        <ul>
+            <li>coffee</li>
+            <li>tea</li>
+            <li>milk</li>
+        </ul>
+    </string>
 </resources>
