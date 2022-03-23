@@ -3,10 +3,6 @@ package com.example.accessibilityfun
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.BulletSpan
-import com.google.accompanist.web.LoadingState
-import com.google.accompanist.web.WebContent
-import com.google.accompanist.web.WebView
-import com.google.accompanist.web.rememberWebViewState
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.accessibilityfun.ui.theme.AccessibilityFunTheme
+import com.google.accompanist.web.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,7 +96,9 @@ class MainActivity : ComponentActivity() {
                                 List.TEXT_LIST -> {
                                     TestTextList()
                                 }
-                                List.WEBVIEW -> TODO()
+                                List.WEBVIEW -> {
+                                    TestWebView()
+                                }
                             }
                         }
                     }
@@ -170,7 +169,24 @@ fun TestTextList() {
 
 @Composable
 fun TestWebView() {
-    val state = rememberWebViewState("https://example.com")
+    val state = WebViewState(WebContent.Data(data =
+    "<!DOCTYPE html>\n" +
+            "<html>\n" +
+            "<body>\n" +
+            "\n" +
+            "<h2>Unordered List with Disc Bullets</h2>\n" +
+            "\n" +
+            "<ul>\n" +
+            "  <li>Coffee</li>\n" +
+            "  <li>Tea</li>\n" +
+            "  <li>Milk</li>\n" +
+            "</ul>  \n" +
+            "\n" +
+            "</body>\n" +
+            "</html>\n"
+    )
+    )
+
 
     WebView(
         state
