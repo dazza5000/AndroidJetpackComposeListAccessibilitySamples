@@ -49,26 +49,31 @@ class MainActivity : ComponentActivity() {
                                     onDismissRequest = { showMenu = false }
                                 ) {
                                     DropdownMenuItem(onClick = {
+                                        showMenu = false
                                         listType = List.ROW
                                     }) {
                                         Text("Row")
                                     }
                                     DropdownMenuItem(onClick = {
+                                        showMenu = false
                                         listType = List.COLUMN
                                     }) {
                                         Text("Column")
                                     }
                                     DropdownMenuItem(onClick = {
+                                        showMenu = false
                                         listType = List.SPANNABLE
                                     }) {
                                         Text(List.SPANNABLE.toString())
                                     }
                                     DropdownMenuItem(onClick = {
+                                        showMenu = false
                                         listType = List.TEXT_LIST
                                     }) {
                                         Text(List.TEXT_LIST.toString())
                                     }
                                     DropdownMenuItem(onClick = {
+                                        showMenu = false
                                         listType = List.WEBVIEW
                                     }) {
                                         Text(List.WEBVIEW.toString())
