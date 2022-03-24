@@ -15,8 +15,11 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -153,9 +156,17 @@ fun TestColumn() {
 
 @Composable
 fun TestSpannable() {
+    val bullet = "\u2022"
+    val paragraphStyle = ParagraphStyle(textIndent = TextIndent(restLine = 12.sp))
     Text(
         text = buildAnnotatedString {
-            listItems.toBulletedList()
+            listItems.forEach {
+                withStyle(style = paragraphStyle) {
+                    append(bullet)
+                    append("\t\t")
+                    append(it)
+                }
+            }
         },
         modifier = Modifier.padding(12.dp),
         style = TextStyle(fontSize = 24.sp)
