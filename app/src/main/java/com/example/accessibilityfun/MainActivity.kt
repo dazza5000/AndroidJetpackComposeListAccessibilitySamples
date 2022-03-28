@@ -38,13 +38,13 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     topBar = {
                         TopAppBar(
-                            navigationIcon = {
-                                IconButton(onClick = {
-
-                                }) {
-                                    Icon(Icons.Rounded.ArrowBack, "navigate back")
-                                }
-                            },
+//                            navigationIcon = {
+//                                IconButton(onClick = {
+//
+//                                }) {
+//                                    Icon(Icons.Rounded.ArrowBack, "navigate back")
+//                                }
+//                            },
                             title = {
                                 Text(text = stringResource(R.string.app_name))
                             },
@@ -89,6 +89,18 @@ class MainActivity : ComponentActivity() {
                                     }) {
                                         Text(List.WEBVIEW.toString())
                                     }
+                                    DropdownMenuItem(onClick = {
+                                        showMenu = false
+                                        listType = List.WEBVIEW
+                                    }) {
+                                        Text(List.WEBVIEW.toString())
+                                    }
+                                    DropdownMenuItem(onClick = {
+                                        showMenu = false
+                                        listType = List.CLICKABLE_VIEW
+                                    }) {
+                                        Text(List.CLICKABLE_VIEW.toString())
+                                    }
                                 }
                             }
                         )
@@ -115,6 +127,11 @@ class MainActivity : ComponentActivity() {
                                 List.WEBVIEW -> {
                                     TestWebView()
                                 }
+                                List.CLICKABLE_VIEW -> {
+                                    ArticleCard {
+
+                                    }
+                                }
                             }
                         }
                     }
@@ -130,7 +147,8 @@ enum class List {
     COLUMN,
     SPANNABLE,
     TEXT_LIST,
-    WEBVIEW
+    WEBVIEW,
+    CLICKABLE_VIEW
 }
 
 val listItems = listOf("Apple", "Orange", "Banana", "Grape", "Tomato")
@@ -216,6 +234,18 @@ fun TestWebView() {
         state
     )
 
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ArticleCard(openArticle: () -> Unit) {
+    Card(
+        onClick = openArticle,
+        // R.string.action_read_article = "read article"
+        onClickLabel = "read article"
+    ) {
+        Text("Article A")
+    }
 }
 
 @Preview(showBackground = true)
