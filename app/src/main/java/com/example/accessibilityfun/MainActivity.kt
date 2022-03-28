@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -37,6 +38,13 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     topBar = {
                         TopAppBar(
+                            navigationIcon = {
+                                IconButton(onClick = {
+
+                                }) {
+                                    Icon(Icons.Rounded.ArrowBack, "navigate back")
+                                }
+                            },
                             title = {
                                 Text(text = stringResource(R.string.app_name))
                             },
