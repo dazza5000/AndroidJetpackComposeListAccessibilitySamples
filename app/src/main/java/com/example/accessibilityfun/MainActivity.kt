@@ -8,8 +8,6 @@ import android.text.Spanned
 import android.text.SpannedString
 import android.text.method.LinkMovementMethod
 import android.text.style.BulletSpan
-import android.text.util.Linkify
-import android.util.Patterns
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -233,7 +230,7 @@ fun TestTextList() {
 
 @Composable
 fun LinkifyText() {
-    HtmlSpan(text = tosText)
+    HtmlTextView(text = tosText)
 }
 
 
@@ -391,15 +388,13 @@ data class LinkInfos(
 
 
 @Composable
-fun HtmlSpan(modifier: Modifier = Modifier, text: String?) {
-    
-    
+fun HtmlTextView(modifier: Modifier = Modifier, text: String) {
     val context = LocalContext.current
     val customLinkifyTextView = remember {
         TextView(context)
     }
     AndroidView(modifier = modifier, factory = { customLinkifyTextView }) { textView ->
-        textView.text = tosText.fromHtml()
+        textView.text = text.fromHtml()
         textView.movementMethod = LinkMovementMethod.getInstance()
     }
 }
