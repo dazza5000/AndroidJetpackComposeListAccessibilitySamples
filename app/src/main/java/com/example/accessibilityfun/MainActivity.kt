@@ -1,10 +1,19 @@
 package com.example.accessibilityfun
 
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.text.SpannableString
+import android.text.Spanned
+import android.text.SpannedString
+import android.text.method.LinkMovementMethod
 import android.text.style.BulletSpan
+import android.text.util.Linkify
+import android.util.Patterns
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,17 +24,21 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.ParagraphStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.*
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.example.accessibilityfun.ui.theme.AccessibilityFunTheme
 import com.google.accompanist.web.*
+import java.util.regex.Pattern
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,6 +114,12 @@ class MainActivity : ComponentActivity() {
                                     }) {
                                         Text(List.CLICKABLE_VIEW.toString())
                                     }
+                                    DropdownMenuItem(onClick = {
+                                        showMenu = false
+                                        listType = List.LINKIFY_TEXT
+                                    }) {
+                                        Text(List.LINKIFY_TEXT.toString())
+                                    }
                                 }
                             }
                         )
@@ -132,6 +151,9 @@ class MainActivity : ComponentActivity() {
 
                                     }
                                 }
+                                List.LINKIFY_TEXT -> {
+                                    LinkifyText()
+                                }
                             }
                         }
                     }
@@ -148,7 +170,8 @@ enum class List {
     SPANNABLE,
     TEXT_LIST,
     WEBVIEW,
-    CLICKABLE_VIEW
+    CLICKABLE_VIEW,
+    LINKIFY_TEXT
 }
 
 val listItems = listOf("Apple", "Orange", "Banana", "Grape", "Tomato")
@@ -208,27 +231,15 @@ fun TestTextList() {
     )
 }
 
+@Composable
+fun LinkifyText() {
+    HtmlSpan(text = tosText)
+}
+
 
 @Composable
 fun TestWebView() {
-    val state = WebViewState(WebContent.Data(data =
-    "<!DOCTYPE html>\n" +
-            "<html>\n" +
-            "<body>\n" +
-            "\n" +
-            "<h2>Unordered List with Disc Bullets</h2>\n" +
-            "\n" +
-            "<ul>\n" +
-            "  <li>Coffee</li>\n" +
-            "  <li>Tea</li>\n" +
-            "  <li>Milk</li>\n" +
-            "</ul>  \n" +
-            "\n" +
-            "</body>\n" +
-            "</html>\n"
-    )
-    )
-
+    val state = WebViewState(WebContent.Data(data = tosText))
 
     WebView(
         state
@@ -264,4 +275,142 @@ fun kotlin.collections.List<String>.toBulletedList(): CharSequence {
             end
         }
     }
+}
+
+val tosText = "<p>Use your <a href=\"http://amazon.com/\">Amazon.com</a> Gift Card* towards Books, Electronics, Music, and more. The <a href=\"http://amazon.com/\">Amazon.com</a> web site is the place to find and discover almost any thing you want to buy online at a great price.</p>\n" +
+        "\n" +
+        "<p>Restrictions apply, see <a href=\"https://www.amazon.com/gp/help/customer/display.html/ref=s9_acss_bw_tm_BGMDT7_md1_w?nodeId=3122091&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=merchandised-search-8&pf_rd_r=1FJP0A5NSBGJC5AJC6RK&pf_rd_t=101&pf_rd_p=89081f45-f3a3-44e0-8747-edb0acca2333&pf_rd_i=17238247011\">amazon.com/gc-legal</a></p>\n" +
+        "\n" +
+        "<p>Restrictions apply, see <a href=\"https://www.amazon.com/gp/help/customer/display.html/ref=s9_acss_bw_tm_BGMDT7_md1_w?nodeId=3122091&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=merchandised-search-8&pf_rd_r=1FJP0A5NSBGJC5AJC6RK&pf_rd_t=101&pf_rd_p=89081f45-f3a3-44e0-8747-edb0acca2333&pf_rd_i=17238247011\">amazon.com/gc-legal</a></p>\n"
+
+val tosText2 = "Use your Amazon.com Gift Card* towards Books, Electronics, Music, and more. The Amazon.com web site is the place to find and discover almost any thing you want to buy online at a great price.\n" +
+        "\n" +
+        "Restrictions apply, see amazon.com/gc-legal\n" +
+        "\n" +
+        "Restrictions apply, see amazon.com/gc-legal"
+
+
+@Composable
+fun linkifyText(text: String, textToLink: String, link: String, linkStyle: TextStyle) =
+    buildAnnotatedString {
+        val startIndex = text.indexOf(textToLink)
+        val endIndex = startIndex + textToLink.length
+        append(text)
+        addStyle(
+            style = SpanStyle(
+                color = MaterialTheme.colors.primary,
+                fontSize = linkStyle.fontSize,
+                textDecoration = TextDecoration.Underline
+            ), start = startIndex, end = endIndex
+        )
+
+        // attach a string annotation that stores a URL to the text "link"
+        addStringAnnotation(
+            tag = "WOOT",
+            annotation = link,
+            start = startIndex,
+            end = endIndex
+        )
+    }
+
+
+@Composable
+fun LinkifyText(text: String, modifier: Modifier = Modifier) {
+    val uriHandler = LocalUriHandler.current
+    val layoutResult = remember {
+        mutableStateOf<TextLayoutResult?>(null)
+    }
+    val linksList = extractUrls(text)
+    val annotatedString = buildAnnotatedString {
+        append(text)
+        linksList.forEach { it : LinkInfos ->
+            addStyle(
+                style = SpanStyle(
+                    color = Color.Companion.Blue,
+                    textDecoration = TextDecoration.Underline
+                ),
+                start = it.start,
+                end = it.end
+            )
+            addStringAnnotation(
+                tag = "URL",
+                annotation = it.url,
+                start = it.start,
+                end = it.end
+            )
+        }
+    }
+    Text(text = annotatedString, style = MaterialTheme.typography.body1, modifier = modifier.pointerInput(Unit) {
+        detectTapGestures { offsetPosition ->
+            layoutResult.value?.let {
+                val position = it.getOffsetForPosition(offsetPosition)
+                annotatedString.getStringAnnotations(position, position).firstOrNull()
+                    ?.let { result ->
+                        if (result.tag == "URL") {
+                            uriHandler.openUri(result.item)
+                        }
+                    }
+            }
+        }
+    },
+        onTextLayout = { layoutResult.value = it }
+    )
+}
+
+private val urlPattern: Pattern = Pattern.compile(
+    "(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)"
+            + "(([\\w\\-]+\\.){1,}?([\\w\\-.~]+\\/?)*"
+            + "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};']*)",
+    Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL
+)
+
+fun extractUrls(text: String): ArrayList<LinkInfos> {
+    val matcher = urlPattern.matcher(text)
+    var matchStart: Int
+    var matchEnd: Int
+    val links = arrayListOf<LinkInfos>()
+
+    while (matcher.find()) {
+        matchStart = matcher.start(1)
+        matchEnd = matcher.end()
+
+        var url = text.substring(matchStart, matchEnd)
+        if (!url.startsWith("http://") && !url.startsWith("https://"))
+            url = "https://$url"
+
+        links.add(LinkInfos(url, matchStart, matchEnd))
+    }
+    return links
+}
+
+data class LinkInfos(
+    val url: String,
+    val start: Int,
+    val end: Int
+)
+
+
+@Composable
+fun HtmlSpan(modifier: Modifier = Modifier, text: String?) {
+    
+    
+    val context = LocalContext.current
+    val customLinkifyTextView = remember {
+        TextView(context)
+    }
+    AndroidView(modifier = modifier, factory = { customLinkifyTextView }) { textView ->
+        textView.text = tosText.fromHtml()
+        textView.movementMethod = LinkMovementMethod.getInstance()
+    }
+}
+
+@Suppress("deprecation")
+fun String?.fromHtml(): Spanned {
+    return this?.let { htmlString ->
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(htmlString, Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            Html.fromHtml(htmlString)
+        }
+    } ?: SpannedString("")
 }
